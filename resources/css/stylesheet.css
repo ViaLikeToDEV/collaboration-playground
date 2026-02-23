@@ -1,0 +1,76 @@
+/* --- Global Styles --- */
+body {
+    /* Background color for the whole page */
+    background-color: #f0f4f8; 
+    /* Foreground (text) color */
+    color: #334155; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Header Styles --- */
+.header {
+    text-align: center;
+    padding: 40px 20px 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    color: #1e293b;
+}
+
+/* --- Container Styles --- */
+.card-container {
+    /* Using CSS Grid to automatically place cards side by side */
+    display: grid;
+    /* This makes the grid responsive: cards will wrap to the next line if the screen is too small */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto; /* Centers the container */
+}
+
+/* --- Card Styles --- */
+.card {
+    /* Background color of the card */
+    background-color: #ffffff; 
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
+    
+    /* Simple shadow: x-offset y-offset blur color */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    
+    /* Smooth transition for hover effects */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Optional hover effect: lifts the card slightly and deepens the shadow */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card h2 {
+    margin: 15px 0 5px;
+    font-size: 1.25rem;
+    color: #0f172a;
+}
+
+.card p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #64748b;
+}
+
+/* Placeholder for profile pictures */
+.avatar {
+    width: 80px;
+    height: 80px;
+    background-color: #e2e8f0;
+    border-radius: 50%;
+    margin: 0 auto;
+}
