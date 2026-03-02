@@ -10,39 +10,11 @@ services:
     working_dir: /var/www/html
     ports:
       - "8080:80"
-    depends_on:
-      mysql:
-        condition: service_healthy
     networks:
       - laravel
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
-
-  # ── MySQL ──────────────────────────────────────────────────────────────
-  mysql:
-    image: mysql:8
-    container_name: laravel-mysql
-    restart: unless-stopped
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-example_app}
-      MYSQL_USER: ${DB_USERNAME:-laravel}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - laravel
-
-volumes:
-  mysql_data:
 
 networks:
   laravel:
