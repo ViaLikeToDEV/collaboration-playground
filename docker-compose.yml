@@ -1,20 +1,13 @@
 services:
-  # ── Laravel App (Apache, Production) ───────────────────────────────────
   app:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel-app
+    container_name: laravel-cluster-
     restart: unless-stopped
     working_dir: /var/www/html
     ports:
-      - "${APP_PORT:-8080}:80"
-    networks:
-      - shared-net
+      - "9090:80"
     env_file:
       - .env
-
-networks:
-  shared-net:
-    external: true

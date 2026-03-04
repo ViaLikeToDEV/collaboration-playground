@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     ports:
-      - "${APP_PORT:-8080}:80"
+      - "8080:80"
     volumes:
       - .:/var/www/html
       - vendor:/var/www/html/vendor
@@ -27,7 +27,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-example_app}
+      MYSQL_DATABASE: example_app
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - mysql_data:/var/lib/mysql
