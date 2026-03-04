@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel-cluster-
+    container_name: laravel-cluster-4
     restart: unless-stopped
     working_dir: /var/www/html
     ports:
