@@ -11,11 +11,10 @@ services:
     ports:
       - "8080:80"
     networks:
-      - laravel
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
+      - shared-net
+    env_file:
+      - .env
 
 networks:
-  laravel:
-    driver: bridge
+  shared-net:
+    external: true
