@@ -8,6 +8,6 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     ports:
-      - "9090:80"
+      - "9094:80"
     env_file:
       - .env
