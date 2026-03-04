@@ -1,12 +1,15 @@
 # =============================================================================
-# Stage 1: Composer dependencies
+# Stage 1: Composer dependencies (ติดตั้งแพ็คเกจ PHP)
 # =============================================================================
 FROM composer:latest AS composer
 
+# ตั้งค่าโฟลเดอร์ทำงาน
 WORKDIR /app
 
+# คัดลอกไฟล์ composer
 COPY composer.json composer.lock ./
 
+# เคลียร์แคชของ Composer และติดตั้ง dependencies โดยไม่รวม dev packages
 RUN composer install \
     --no-dev \
     --no-interaction \
@@ -15,18 +18,24 @@ RUN composer install \
     --optimize-autoloader
 
 # =============================================================================
-# Stage 2: Node.js — build frontend assets
+# Stage 2: Node.js (สร้าง Frontend Assets)
 # =============================================================================
 FROM node:20-alpine AS node
 
+# ตั้งค่าโฟลเดอร์ทำงาน
 WORKDIR /app
 
+# คัดลอกไฟล์ package
 COPY package.json package-lock.json ./
+
+# ติดตั้ง npm dependencies
 RUN npm ci
 
+# คัดลอกโค้ดสำหรับ vite
 COPY vite.config.js ./
 COPY resources ./resources
 
+# Build assets สำหรับใช้งาน
 RUN npm run build
 
 # =============================================================================
@@ -34,16 +43,16 @@ RUN npm run build
 # =============================================================================
 FROM php:8.4-apache AS production
 
-# Enable Apache mod_rewrite for Laravel
+# เปิดใช้งาน mod_rewrite ของ Apache
 RUN a2enmod rewrite
 
-# Set Apache document root to Laravel's public directory
+# ตั้งค่า Apache document root ไปที่โฟลเดอร์ public ของ Laravel
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Install system dependencies
+# ติดตั้ง dependencies ที่จำเป็นของระบบ
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg62-turbo-dev \
@@ -57,28 +66,31 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Use production PHP configuration
+# ตั้งค่าการใช้งาน PHP สำหรับ Production
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+# ตั้งค่าโฟลเดอร์ทำงาน
 WORKDIR /var/www/html
 
-# Copy application source
+# คัดลอกโค้ด Laravel ภายใน container
 COPY . .
 
-# Copy Composer dependencies from stage 1
+# นำ dependencies จาก Stage 1 (Composer) มาใช้งาน
 COPY --from=composer /app/vendor ./vendor
 
-# Copy compiled frontend assets from stage 2
+# นำไฟล์ที่ Build แล้วจาก Stage 2 (Node) มาใช้งาน
 COPY --from=node /app/public/build ./public/build
 
-# Set permissions
+# ตั้งค่า permission ให้ Laravel ทำงานได้
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 storage bootstrap/cache
 
-# Copy entrypoint script
+# คัดลอก script สำหรับเช็ตอัพระบบก่อนเริ่มทำงาน
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# เปิดพอร์ต 80 เพื่อให้ container รับ HTTP ได้
 EXPOSE 80
 
+# นำ script มาทำงานเป็น Entrypoint
 ENTRYPOINT ["docker-entrypoint.sh"]

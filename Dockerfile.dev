@@ -1,15 +1,16 @@
+# ใช้ PHP 8.4 พร้อม Apache เป็น base image
 FROM php:8.4-apache
 
-# Enable Apache mod_rewrite for Laravel
+# เปิดใช้งาน mod_rewrite ของ Apache
 RUN a2enmod rewrite
 
-# Set Apache document root to Laravel's public directory
+# ตั้งค่า Apache document root ไปที่โฟลเดอร์ public ของ Laravel
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Install system dependencies
+# ติดตั้ง dependencies ที่จำเป็นของระบบ และ Xdebug สำหรับ Development
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -27,25 +28,29 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-enable xdebug \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Composer
+# ติดตั้ง Composer ล่าสุด
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install Node.js 20
+# ติดตั้ง Node.js 20 สำหรับ Development
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Configure PHP for development
+# ตั้งค่าการใช้งาน PHP สำหรับ Development
 RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
-# Xdebug configuration
+# ตั้งค่า Xdebug
 RUN echo "xdebug.mode=develop,debug" >> "$PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini" \
     && echo "xdebug.client_host=host.docker.internal" >> "$PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini" \
     && echo "xdebug.start_with_request=yes" >> "$PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini"
 
+# ตั้งค่าโฟลเดอร์ทำงาน
 WORKDIR /var/www/html
 
-# Source code is NOT copied — it will be bind-mounted via docker-compose
+# หมายเหตุ: ไม่ได้คัดลอก Source code เข้ามา เพราะจะใช้ bind-mount ผ่าน docker-compose แทน
+
+# เปิดพอร์ต 80 เพื่อให้ container รับ HTTP ได้
 EXPOSE 80
 
+# รัน Apache เมื่อตัว container เริ่มทำงาน
 CMD ["apache2-foreground"]

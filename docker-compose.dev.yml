@@ -1,5 +1,4 @@
 services:
-  # ── Laravel App (Apache, Development) ──────────────────────────────────
   app:
     build:
       context: .
@@ -8,7 +7,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     ports:
-      - "8080:80"
+      - "${APP_PORT:-8080}:80"
     volumes:
       - .:/var/www/html
       - vendor:/var/www/html/vendor
@@ -21,7 +20,6 @@ services:
     environment:
       - PHP_IDE_CONFIG=serverName=Docker
 
-  # ── MySQL ──────────────────────────────────────────────────────────────
   mysql:
     image: mysql:8
     container_name: laravel-mysql-dev
@@ -30,9 +28,7 @@ services:
       - "3306:3306"
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-example_app}
-      MYSQL_USER: ${DB_USERNAME:-laravel}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -43,7 +39,6 @@ services:
     networks:
       - laravel-dev
 
-  # ── Vite Dev Server (HMR) ─────────────────────────────────────────────
   vite:
     image: node:20-alpine
     container_name: laravel-vite-dev
