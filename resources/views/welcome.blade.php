@@ -9,7 +9,7 @@
 <body>
 
     <header class="header">
-        <h1>Welcome to my team</h1>
+        <h1>Welcome to my team2</h1>
     </header>
 
     <main class="card-container">
