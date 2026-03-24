@@ -53,4 +53,4 @@ WORKDIR /var/www/html
 EXPOSE 80
 
 # รัน Apache เมื่อตัว container เริ่มทำงาน
-CMD ["apache2-foreground"]
+# CMD ["apache2-foreground"]
